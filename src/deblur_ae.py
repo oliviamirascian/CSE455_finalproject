@@ -9,7 +9,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import time
-import albumentations
 import argparse
 import models
 
@@ -21,7 +20,7 @@ from sklearn.model_selection import train_test_split
 
 # constructing the argument parser
 parser = argparse.ArgumentParser()
-parser.add_argument('-e', '--epochs', type=int, default=50, 
+parser.add_argument('-e', '--epochs', type=int, default=10,
             help='number of epochs to train the model for')
 args = vars(parser.parse_args())
 
@@ -37,7 +36,7 @@ device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
 print(device)
 
-batch_size = 2
+batch_size = 1
 
 gauss_blur = os.listdir('../input/gaussian_blurred/')
 gauss_blur.sort()
@@ -51,14 +50,14 @@ for i in range(len(gauss_blur)):
 y_sharp = []
 for i in range(len(sharp)):
     y_sharp.append(sharp[i])
-    
-print(x_blur[10])
-print(y_sharp[10])
+
+# print(x_blur[10])
+# print(y_sharp[10])
 
 (x_train, x_val, y_train, y_val) = train_test_split(x_blur, y_sharp, test_size=0.25)
 
-print(len(x_train))
-print(len(x_val))
+# print(len(x_train))
+# print(len(x_val))
 
 # define transforms
 transform = transforms.Compose([
@@ -95,12 +94,14 @@ val_data = DeblurDataset(x_val, y_val, transform)
 trainloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 valloader = DataLoader(val_data, batch_size=batch_size, shuffle=False)
 
+# TODO: Add more models
 model = models.CNN().to(device)
 print(model)
 
 # the loss function
 criterion = nn.MSELoss()
 # the optimizer
+# TODO: Compare different optimizers and learning rates
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau( 
         optimizer,
@@ -110,7 +111,6 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         verbose=True
     )
 
-# training function
 def fit(model, dataloader, epoch):
     model.train()
     running_loss = 0.0
