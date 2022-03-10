@@ -38,7 +38,6 @@ class DeblurBoxFilter(Dataset):
 def train(model, train_loader, optimizer, criterion):
     train_loss = 0.0
     model.train()
-
     for i, (data, target) in tqdm(enumerate(train_loader), total=len(train_loader)):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
