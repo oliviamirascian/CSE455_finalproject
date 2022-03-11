@@ -26,10 +26,7 @@ class DeblurGaussian(Dataset):
 
     def __getitem__(self, index):
         blur_image = cv2.imread(f"../input/gaussian_blurred/{self.image_data[index]}")
-
-        if self.transforms:
-            blur_image = self.transforms(blur_image)
-
+        blur_image = self.transforms(blur_image)
         grayscale_image = cv2.imread(f"../input/grayscaled/{self.labels[index]}")
         grayscale_image = self.transforms(grayscale_image)
         return blur_image, grayscale_image
@@ -48,7 +45,7 @@ def train(model, train_loader, optimizer, criterion):
         optimizer.step()
         train_loss += loss.item()
     train_loss = train_loss / len(train_loader)
-    print("Train Loss:", str(round(train_loss, 5)))
+    print("Training Loss:", str(round(train_loss, 5)))
     return train_loss
 
 
@@ -64,9 +61,9 @@ def validate(model, val_loader, criterion, epoch, model_name):
     val_loss = val_loss / len(val_loader)
     print("Validation Loss:", str(round(val_loss, 5)))
     if epoch == 0:
-        save_deblurred_image(data.cpu().data, name=f"../output/gaussian_deblurred/gaussian_blurred.jpg")
-        save_deblurred_image(target.cpu().data, name=f"../output/gaussian_deblurred/gaussian_original.jpg")
-    save_deblurred_image(output.cpu().data, name=f"../output/gaussian_deblurred/gaussian_deblurred{epoch}_{model_name}.jpg")
+        save_deblurred_image(data.cpu().data, name=f"../output/gaussian_deblurred/gaussian_blurred2.jpg")
+        save_deblurred_image(target.cpu().data, name=f"../output/gaussian_deblurred/gaussian_original2.jpg")
+    save_deblurred_image(output.cpu().data, name=f"../output/gaussian_deblurred/gaussian_deblurred2{epoch}_{model_name}.jpg")
     return val_loss
 
 
@@ -76,12 +73,12 @@ def save_deblurred_image(img, name):
 
 
 def main():
-    gauss_blur = os.listdir('../input/gaussian_blurred/')
-    grayscale = os.listdir('../input/grayscaled')
+    gaussian_blur = os.listdir('../input/gaussian_blurred/')
+    grayscale = os.listdir('../input/grayscaled/')
 
     x_input = []
-    for i in range(len(gauss_blur)):
-        x_input.append(gauss_blur[i])
+    for i in range(len(gaussian_blur)):
+        x_input.append(gaussian_blur[i])
 
     y_input = []
     for i in range(len(grayscale)):
@@ -105,13 +102,14 @@ def main():
     model2 = models.SRCNN2().to(device)
     model3 = models.SRCNN3().to(device)
 
-    epochs = 10
+    epochs = 20
     lr = 5e-5
     models_list = [model1, model2, model3]
     model_names = ['model1', 'model2', 'model3']
+    labels = ['SRCNN (9-1-5)', 'SRCNN (9-3-1-5)', 'SRCNN (9-1-1-1-5)']
     train_losses = []
     val_losses = []
-    for (model, model_name) in zip(models_list, model_names):
+    for (model, model_name, label) in zip(models_list, model_names, labels):
         for epoch in range(epochs):
             optimizer = Adam(model.parameters(), lr)
             scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -129,14 +127,14 @@ def main():
             val_losses.append(val_loss)
             scheduler.step(val_loss)
 
-        plt.figure(figsize=(10, 7))
-        plt.plot(train_losses, color='blue', label='Train Loss')
+        plt.figure(figsize=(10, 8))
+        plt.plot(train_losses, color='blue', label='Training Loss')
         plt.plot(val_losses, color='red', label='Validation Loss')
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.legend()
-        plt.title(f'{model_name} Gaussian Deblur Training and Validation Loss')
-        plt.savefig(f'../output/gaussian_loss_{model_name}.png')
+        plt.title(f'{label} Gaussian Deblur Training and Validation Loss')
+        plt.savefig(f'../output/gaussian2_loss_{model_name}.png')
         plt.show()
         train_losses = []
         val_losses = []
