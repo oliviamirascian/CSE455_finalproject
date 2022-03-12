@@ -1,37 +1,64 @@
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
-class CNN(nn.Module):
+
+class SRCNN1(nn.Module):
     def __init__(self):
-        super(CNN, self).__init__()
+        super(SRCNN1, self).__init__()
 
-        self.conv1 = nn.Conv2d(3, 128, kernel_size=5, padding=1)
-        self.conv2 = nn.Conv2d(128, 64, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(64, 3, kernel_size=1, padding=1)
+        self.layers = nn.Sequential(
+            nn.Conv2d(3, 128, kernel_size=9, padding=2),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(128, 64, kernel_size=1, padding=2),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(64, 3, kernel_size=5, padding=2)
+        )
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
+        return self.layers(x)
 
-        return x
 
-class SimpleAE(nn.Module):
+class SRCNN2(nn.Module):
     def __init__(self):
-        super(SimpleAE, self).__init__()
+        super(SRCNN2, self).__init__()
 
-        self.encoder = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=5),
-            nn.ReLU(True),
-            nn.Conv2d(32, 64, kernel_size=5),
-            nn.ReLU(True))
-        self.decoder = nn.Sequential(             
-            nn.ConvTranspose2d(64, 32, kernel_size=5),
-            nn.ReLU(True),
-            nn.ConvTranspose2d(32, 3, kernel_size=5),
-            nn.ReLU(True))
-    def forward(self,x):
-        x = self.encoder(x)
-        x = self.decoder(x)
-        return x
+        self.layers = nn.Sequential(
+            nn.Conv2d(3, 128, kernel_size=9, padding=2),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(128, 64, kernel_size=3, padding=2),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(64, 32, kernel_size=1, padding=2),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(32, 3, kernel_size=5, padding=1)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+
+
+class SRCNN3(nn.Module):
+    def __init__(self):
+        super(SRCNN3, self).__init__()
+
+        self.layers = nn.Sequential(
+            nn.Conv2d(3, 128, kernel_size=9, padding=2),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(128, 64, kernel_size=1, padding=1),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(64, 32, kernel_size=1, padding=1),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(32, 16, kernel_size=1, padding=1),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Conv2d(16, 3, kernel_size=5, padding=1)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
