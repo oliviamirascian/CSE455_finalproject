@@ -1,6 +1,6 @@
 # Deblurring Anime Faces using Deep Convolutional Neural Networks 
 
-* **You can find the dataset [here](https://www.kaggle.com/scribbless/another-anime-face-dataset) on Kaggle:**
+* **You can find the dataset [here](https://www.kaggle.com/scribbless/another-anime-face-dataset) on Kaggle.**
 
 * 1,000 images of the dataset is already in the `animefaces`  folder, to use the whole dataset extract it inside this folder
 
